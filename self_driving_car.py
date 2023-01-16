@@ -68,11 +68,11 @@ def preprocess_img_no_imread(img):
 
 def nvidia_model():
     model = Sequential()
-    model.add(Convolution2D(24, (5, 5), strides=(2, 2), input_shape=(66, 200, 3), activation='elu'))
+    model.add(Convolution2D(24, (5, 5), strides=(2, 2), input_shape=(66, 200, 3), activation='relu'))
     model.add(Convolution2D(36, (5, 5), strides=(2, 2), activation='elu'))
     model.add(Convolution2D(48, (5, 5), strides=(2, 2), activation='elu'))
     model.add(Convolution2D(64, (3, 3), activation='elu'))
-    model.add(Convolution2D(64, (3, 3), activation='elu'))
+    model.add(Convolution2D(64, (3, 3), activation='elu')) 
     #model.add(Dropout(0.5))
     model.add(Flatten())
     model.add(Dense(100, activation='elu'))
@@ -143,7 +143,7 @@ def batch_generator(image_paths, steering_ang, batch_size, is_training):
         yield np.asarray(batch_img), np.asarray(batch_steering)
 
 
-datadir = "E:\\Assignment 1\\smart tech\\ca2"
+datadir = "C:\\Users\\richard\\Documents\\College\\Smart Tech\\Working" 
 columns = ['center', 'left', 'right', 'steering', 'throttle', 'reverse', 'speed']
 data = pd.read_csv(os.path.join(datadir, 'driving_log.csv'), names = columns)
 pd.set_option('display.max_columns', 7)
@@ -153,12 +153,12 @@ data['left'] = data['left'].apply(path_leaf)
 data['right'] = data['right'].apply(path_leaf)
 
 num_bins = 25
-samples_per_bin = 500
+samples_per_bin = 400
 hist, bins = np.histogram(data['steering'], num_bins)
 centre = (bins[:-1] + bins[1:])*0.5
 plt.bar(centre, hist, width=0.05)
 plt.plot((np.min(data['steering']), np.max(data['steering'])), (samples_per_bin, samples_per_bin))
-#plt.show()
+plt.show()
 
 remove_list=[]
 print('Total data: ', len(data))
@@ -181,7 +181,7 @@ plt.bar(centre, hist, width=0.05)
 plt.plot((np.min(data['steering']), np.max(data['steering'])), (samples_per_bin, samples_per_bin))
 plt.show()
 
-image_paths, steerings = load_steering_img(datadir+'\IMG', data)
+image_paths, steerings = load_steering_img(datadir+'/IMG', data)
 X_train, X_valid, y_train, y_valid = train_test_split(image_paths, steerings, test_size=0.2, random_state=6)
 print(f"Training samples {len(X_train)}\n Validation samples {len(X_valid)}")
 
@@ -276,7 +276,7 @@ plt.show()
 model = nvidia_model()
 print(model.summary())
 
-history = model.fit(batch_generator(X_train, y_train, 200, 1), steps_per_epoch=100, epochs=30, validation_data=batch_generator(X_valid, y_valid, 200, 0), validation_steps=200, verbose=1, shuffle=1)
+history = model.fit(batch_generator(X_train, y_train, 200, 1), steps_per_epoch=100, epochs=50, validation_data=batch_generator(X_valid, y_valid, 200, 0), validation_steps=200, verbose=1, shuffle=1)
 
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
@@ -285,24 +285,4 @@ plt.title('Loss')
 plt.xlabel("Epoch")
 plt.show()
 
-model.save('model_track1_plus_track2.h5')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+model.save('model.h5')
